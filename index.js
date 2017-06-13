@@ -3,56 +3,52 @@
 const request = require('request-micro')
 const aws4 = require('aws4')
 const assert = require('assert')
-const encoder = require('aws-form-urlencoded')
 
 module.exports = makeClient
 
-function noOp () {}
-
-function makeClient (options) {
-  let context = Object.assign({}, options)
-  assert(context.region, 'Region is a required option for SES clients')
-
-  // Configure optional logger
-  if ('logger' in context) {
-    context.log = context.logger.log.bind(null, 'ses thin client')
-    delete context.logger
-  } else {
-    context.log = noOp
+const noop = () => {}
+const functionElseNoop = (func) => {
+  if (func && typeof func === 'function') {
+    return func
   }
-
+  return noop
+}
+function logWrapper (loggerArg) {
+  const logger = loggerArg || {}
   return {
-    sendEmail: sendEmail.bind(null, context)
+    log: functionElseNoop(logger.log),
+    error: functionElseNoop(logger.error),
+    warn: functionElseNoop(logger.warn),
+    info: functionElseNoop(logger.info),
+    debug: functionElseNoop(logger.debug)
   }
 }
 
-function sendEmail (context, options, callback) {
+function makeClient (options) {
+  let context = Object.assign({}, options)
+  context.logger = logWrapper(options.logger)
+
+  return {
+    getObject: getObject.bind(null, context),
+    // putObject: putObject.bind(null, context),
+    deleteObject: deleteObject.bind(null, context)
+  }
+}
+
+function optionalCallback (context, action, callback) {
   let sendResult
 
   // encodeBody and aws4.sign can both throw before the promise starts
   try {
-    context.log('starting send', options)
-    sendResult = request(
-      aws4.sign({
-        service: 'email',
-        region: context.region,
-        method: 'POST',
-        protocol: 'https:',
-        path: '/',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: encodeBody(context, options)
-      })
-    )
+    context.log('starting send')
+    sendResult = action()
   } catch (e) {
-    context.log(e)
+    context.error(e)
     sendResult = Promise.reject(e)
   }
   if (!callback) {
     return sendResult.then(result => {
       context.log('finished', result.statusCode, result.statusMessage)
-      context.log('data', result.data.toString())
       return result
     })
   }
@@ -61,39 +57,37 @@ function sendEmail (context, options, callback) {
     .catch(error => callback(error))
 }
 
-function encodeBody (context, options) {
-  context.log('validating params', options)
-  validateParams(options)
-  context.log('params validated')
-
-  let body = encoder(Object.assign({}, options, { Action: 'SendEmail' }))
-  context.log('body encoded', body)
-  return body
+function getObject (context, params, callback) {
+  return optionalCallback(context, () => request(
+    aws4.sign({
+      service: 'email',
+      host: `${params.Bucket}}.s3.amazonaws.com`,
+      method: 'GET',
+      protocol: 'https:',
+      path: '/' + encodeURIComponent(params.Key)
+    })
+  ), callback)
 }
 
-const requiredEmailParams = ['Source', 'Destination', 'Message']
+function deleteObject (context, params, callback) {
+  return optionalCallback(context, () => request(
+    aws4.sign({
+      service: 'email',
+      host: `${params.Bucket}}.s3.amazonaws.com`,
+      method: 'DELETE',
+      protocol: 'https:',
+      path: '/' + encodeURIComponent(params.Key)
+    })
+  ), callback)
+}
 
-function validateParams (params) {
-  requiredEmailParams.forEach(prop =>
-    assert(params[prop], `The "${prop}" property is required`)
-  )
-  assert(params.Message.Body, 'The "Message.Body" property is required')
-  assert(params.Message.Subject, 'The "Message.Subject" property is required')
-  assert(
-    params.Message.Subject.Data,
-    'The "Message.Subject.Data" property is required'
-  )
-  if ('Html' in params.Message.Body) {
-    assert(
-      params.Message.Body.Html.Data,
-      'The "Message.Body.Html.Data" property is required when using Html'
-    )
-  } else if ('Text' in params.Message.Body) {
-    assert(
-      params.Message.Body.Text.Data,
-      'The "Message.Body.Text.Data" property is required when using Text'
-    )
-  } else {
-    throw new Error('One of "Html", "Text" is required on Message.Body')
-  }
+function putObject (context, params) {
+  /*
+  {
+  Body: <Binary String>,
+  Bucket: "examplebucket",
+  Key: "exampleobject"
+ }
+ */
+  // TODO: implement upload
 }
