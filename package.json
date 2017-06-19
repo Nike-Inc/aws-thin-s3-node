@@ -1,11 +1,18 @@
 {
   "name": "aws-thin-s3",
-  "version": "0.1.0",
+  "version": "0.9.0",
   "description": "aws thin S3 client",
   "main": "lib/s3.js",
   "repository": "git@github.nike.com:ngp/aws-thin-ses.git",
   "author": "Tim Kye <Timothy.Kye@nike.com>",
   "license": "MIT",
+  "keywords": [
+    "aws",
+    "aws-sdk",
+    "s3",
+    "thin",
+    "lambda"
+  ],
   "files": [
     "lib"
   ],
