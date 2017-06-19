@@ -24,3 +24,29 @@ This thin client is designed for basic file use with S3. It does not support any
 * `getObject` - Full API Support, see [docs](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#getObject-property)
 * `deleteObject` - Full API Support, see [docs](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#deleteObject-property)
 * `putObject` - Partial API Support, input supports `Bucket`, `Key`, `Body` and ContentType; see [docs](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#putObject-property)
+
+# Using the logger
+
+The client allows a logger to be passed into the constructor that will log at various levels, allowing the consumer to control where and how much logging this module produces. The logger supports 4 optional properties: `debug`, `info`, `warn`, and `error`. Only the provided functions will be used.
+
+* ***Debug*** - The noisiest level. Produces frequent logs which may include sensitive information like full HTTP(s) responses. This is not safe for production.
+* ***Info*** - Standard information about module actions; does not log response data but does log input parameters. This should be safe for production unless requests are sensitive.
+* ***Warn*** - Indicates a non-fatal error or condition that may require attention. Recommended for production.
+* ***Error*** - Fatal errors, does not log response data but will log input parameters.
+
+## Example Logger 
+
+```
+let exampleLogger = {
+  debug: (...args) => console.log(...args.map(a => require('util').inspect(a, { colors: true, depth: null }))), // eslint-disable-line
+  error: (...args) => {
+    // do something special
+    console.error('yo, something broke', ...args)
+  },
+  // warn: console.log.bind(console)
+  info: console.log.bind(console)
+}
+let client = s3({ logger: exampleLogger, region: 'us-west-2' })
+```
+
+This logger will log teriminal-friendly debug messages, erros, and info, but no warnings.
