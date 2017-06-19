@@ -21,7 +21,7 @@
     "test:int": "blue-tape test/**/**.int.js | tap-spec",
     "test:int:coverage": "nyc --check-coverage --lines 80 npm run test:int",
     "report:int": "nyc report --reporter=html",
-    "test:watch:int": "npm run test:int -s & ./node_modules/.bin/chokidar 'lib/**/*.js' 'test/**/*.int.js' --polling -c \"./node_modules/.bin/blue-tape test/**/**.int.js | node_modules/.bin/tap-spec\""
+    "test:int:watch": "npm run test:int -s & ./node_modules/.bin/chokidar 'lib/**/*.js' 'test/**/*.int.js' --polling -c \"./node_modules/.bin/blue-tape test/**/**.int.js | node_modules/.bin/tap-spec\""
   },
   "dependencies": {
     "aws4": "^1.6.0",
