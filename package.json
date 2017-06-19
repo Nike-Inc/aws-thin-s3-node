@@ -1,13 +1,19 @@
 {
   "name": "aws-thin-s3",
-  "version": "0.1.0",
+  "version": "0.9.0",
   "description": "aws thin S3 client",
-  "main": "index.js",
+  "main": "lib/s3.js",
   "repository": "git@github.nike.com:ngp/aws-thin-ses.git",
   "author": "Tim Kye <Timothy.Kye@nike.com>",
   "license": "MIT",
+  "keywords": [
+    "aws",
+    "aws-sdk",
+    "s3",
+    "thin",
+    "lambda"
+  ],
   "files": [
-    "index.js",
     "lib"
   ],
   "engines": {
@@ -17,8 +23,12 @@
     "style": "standard \"index.js\" \"lib/**/*.js\" | snazzy",
     "style:fix": "standard \"index.js\" \"lib/**/*.js\" --fix",
     "test": "npm run style && npm run test:unit",
-    "test:unit": " blue-tape test/**/**.spec.js | tap-spec",
-    "test:watch": "npm run test:unit -s & ./node_modules/.bin/chokidar 'src/**/*.js' 'test/**/*.spec.js' --polling -c \"./node_modules/.bin/blue-tape test/**/**.spec.js | node_modules/.bin/tap-spec\""
+    "test:unit": "blue-tape test/**/**.spec.js | tap-spec",
+    "test:watch": "npm run test:unit -s & ./node_modules/.bin/chokidar 'lib/**/*.js' 'test/**/*.spec.js' --polling -c \"./node_modules/.bin/blue-tape test/**/**.spec.js | node_modules/.bin/tap-spec\"",
+    "test:int": "blue-tape test/**/**.int.js | tap-spec",
+    "test:int:coverage": "nyc --check-coverage --lines 80 npm run test:int",
+    "report:int": "nyc report --reporter=html",
+    "test:int:watch": "npm run test:int -s & ./node_modules/.bin/chokidar 'lib/**/*.js' 'test/**/*.int.js' --polling -c \"./node_modules/.bin/blue-tape test/**/**.int.js | node_modules/.bin/tap-spec\""
   },
   "dependencies": {
     "aws4": "^1.6.0",
@@ -28,6 +38,9 @@
     "babel-eslint": "^7.2.3",
     "blue-tape": "^1.0.0",
     "chokidar-cli": "^1.2.0",
+    "co": "^4.6.0",
+    "fuse-box": "^2.1.0",
+    "nyc": "^11.0.2",
     "snazzy": "^7.0.0",
     "standard": "^10.0.2",
     "tap-spec": "^4.1.1"
