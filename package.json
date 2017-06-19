@@ -19,6 +19,8 @@
     "test:unit": "blue-tape test/**/**.spec.js | tap-spec",
     "test:watch": "npm run test:unit -s & ./node_modules/.bin/chokidar 'lib/**/*.js' 'test/**/*.spec.js' --polling -c \"./node_modules/.bin/blue-tape test/**/**.spec.js | node_modules/.bin/tap-spec\"",
     "test:int": "blue-tape test/**/**.int.js | tap-spec",
+    "test:int:coverage": "nyc --check-coverage --lines 80 npm run test:int",
+    "report:int": "nyc report --reporter=html",
     "test:watch:int": "npm run test:int -s & ./node_modules/.bin/chokidar 'lib/**/*.js' 'test/**/*.int.js' --polling -c \"./node_modules/.bin/blue-tape test/**/**.int.js | node_modules/.bin/tap-spec\""
   },
   "dependencies": {
@@ -31,6 +33,7 @@
     "chokidar-cli": "^1.2.0",
     "co": "^4.6.0",
     "fuse-box": "^2.1.0",
+    "nyc": "^11.0.2",
     "snazzy": "^7.0.0",
     "standard": "^10.0.2",
     "tap-spec": "^4.1.1"
