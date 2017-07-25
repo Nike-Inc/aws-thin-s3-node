@@ -45,6 +45,8 @@ test('client should be able to upload, read, and delete a file', t => {
     } catch (e) {
       t.ok(e.toString().match(/Not Found: The specified key does not exist\./i), 'file has been deleted')
     }
+  }).catch(e => {
+    console.error('error in test', e)
   })
 })
 
