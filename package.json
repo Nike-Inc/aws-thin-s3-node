@@ -1,6 +1,6 @@
 {
   "name": "aws-thin-s3",
-  "version": "0.10.1",
+  "version": "0.10.2-beta.1",
   "description": "aws thin S3 client",
   "main": "lib/s3.js",
   "repository": "git@github.nike.com:ngp/aws-thin-ses.git",
