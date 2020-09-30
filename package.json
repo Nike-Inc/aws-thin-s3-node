@@ -1,6 +1,6 @@
 {
   "name": "aws-thin-s3",
-  "version": "0.10.2",
+  "version": "1.0.0",
   "description": "aws thin S3 client",
   "main": "lib/s3.js",
   "repository": "git@github.nike.com:ngp/aws-thin-ses.git",
@@ -17,7 +17,7 @@
     "lib"
   ],
   "engines": {
-    "node": ">=4"
+    "node": ">=10"
   },
   "scripts": {
     "style": "standard \"index.js\" \"lib/**/*.js\" | snazzy",
